@@ -1,4 +1,5 @@
 import tkinter as tk
+import random
 from PIL import Image, ImageTk
 from lógica_da_expansão import Simular_expansao
 
@@ -51,43 +52,73 @@ class GameGui:
         self.message.config(text=expansion.message)
 
     def tries_message_update(self):
-        self.tries_message.config(text=f"Tentativas desde o último Jackpot: {expansion.tries}")
+        self.tries_message.config(text=f"Tentativas desde o último Jackpot: {expansion.tries}")     
 
     def spin(self):
+        self.dance.forget()
+        self.jackpot_animating = False
         expansion.play()
-        self.slots.config(text=f"| {expansion.slots[0]} | | {expansion.slots[1]} | | ? |")
         self.message_update()
         self.tries_message_update()
-
         self.canvas.delete("all")
+
+        final_numbers = [expansion.slots[0], expansion.slots[1], expansion.slots[2]]
+
+        animation_speed = 50
+        total_iterations = 20
+
+        def update_numbers(iteration):
+            if iteration < total_iterations:
+                random_numbers = [random.choice(range(1, 8)) for _ in range(3)]
+                self.slots.config(text=f"| {random_numbers[0]} | | {random_numbers[1]} | | {random_numbers[2]} |")
+                self.root.after(animation_speed, lambda: update_numbers(iteration + 1))
+            else:
+                self.slots.config(text=f"| {final_numbers[0]} | | {final_numbers[1]} | | ? |")
+                self.message_update()
+
+        update_numbers(0)
 
         x1, y1 = 25, 25
         x2, y2 = 75, 75
         self.canvas.create_oval(x1, y1, x2, y2, fill=expansion.ball)
 
     def riichi(self):
-        self.slots.config(text=f"| {expansion.slots[0]} | | {expansion.slots[1]} | | {expansion.slots[2]} |")
-        expansion.riichi()
-        self.message_update()
+        final_number = expansion.slots[2]
+        animation_speed = 100
+        total_iterations = 20
 
-        if expansion.jackpot == True:
-            self.canvas.delete("all")
-            self.animate_images()
+        def update_last_number(iteration):
+                if iteration < total_iterations:
+                    random_number = random.choice(range(1, 8))
+                    self.slots.config(text=f"| {expansion.slots[0]} | | {expansion.slots[1]} | | {random_number} |")
+                    self.root.after(animation_speed, lambda: update_last_number(iteration + 1))
+                else:
+                    self.slots.config(text=f"| {expansion.slots[0]} | | {expansion.slots[1]} | | {final_number} |")
+                    expansion.riichi()
+                    self.message_update()
+                    if expansion.jackpot == True:
+                        self.canvas.delete("all")
+                        self.animate_images()
 
-    def animate_images(self, iterations=20):
+
+        if expansion.slots[0] != 0:
+            update_last_number(0)
+        else:
+            self.message.config(text="Você precisa jogar se quiser ganhar!")
+                    
+        
+
+    def animate_images(self):
         self.dance.pack()
 
         def toggle_image():
-            self.image_index = (self.image_index + 1) % len(self.images)
-            self.current_image = self.images[self.image_index]
-            self.dance.config(image=self.current_image)
-            iterations_left[0] -= 1
-            if iterations_left[0] > 0:
+            if self.jackpot_animating:
+                self.image_index = (self.image_index + 1) % len(self.images)
+                self.current_image = self.images[self.image_index]
+                self.dance.config(image=self.current_image)
                 self.root.after(120, toggle_image)
-            if iterations_left[0] == 0:
-                self.dance.forget()
 
-        iterations_left = [iterations]
+        self.jackpot_animating = True
         toggle_image()
 
 if __name__ == "__main__":
