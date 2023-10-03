@@ -5,7 +5,7 @@ class Simular_expansao:
         self.cards = list(range(1, 8))
         self.chance = list(range(1,101))
         self.ball = None
-        self.shoot = None
+        self.shoot = 0
         self.slots = [0, 0, 0]
         self.tries = 0
         self.message = "Se sente com sorte?"
@@ -13,7 +13,7 @@ class Simular_expansao:
 
     def draw(self):
         print(f"Tentativas desde o último Jackpot: {self.tries}")
-        if self.ball == "white":
+        if self.ball == "purple":
             slot = random.choice(self.cards)
             for i in range(0, len(self.slots)):
                 self.slots[i] = slot
@@ -64,7 +64,7 @@ class Simular_expansao:
             self.ball = "yellow"
             self.cards = list(range(2, 5))
         else:
-            self.ball = "white"
+            self.ball = "purple"
 
         self.draw()
 
@@ -108,19 +108,3 @@ class Simular_expansao:
                 self.message = "Parece que não foi dessa vez!"
         
         self.slots = [0, 0, 0]
-
-expansion = Simular_expansao()
-
-'''
-    while(True):
-        print("Type 1 for 'play' or 2 for 'riichi'")
-        choice = input()
-        if choice == "1":
-            print("")
-            expansion.play()
-        elif choice == '2':
-            print("")
-            expansion.riichi()
-        else:
-            print("wrong answer")
-'''
