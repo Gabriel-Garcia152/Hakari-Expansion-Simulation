@@ -94,8 +94,8 @@ class GameGui:
         def move_ball(x, y):
             self.canvas.delete("all")
             self.canvas.create_oval(x, y, x - 50, y + 50, fill=EXPANSION.ball)
-            x += 5  # Ajuste a velocidade da animação alterando esse valor
-            if x < 80:  # Ajuste a condição de parada para a animação
+            x += 5
+            if x < 80:
                 self.root.after(animation_speed, lambda: move_ball(x, y))
 
         move_ball(x1, y1)
@@ -124,6 +124,7 @@ class GameGui:
         else:
             self.message.config(text="Você precisa jogar se quiser ganhar!")
 
+    #winnig gif
     def animate_images(self):
         self.dance.pack()
         def toggle_image():
