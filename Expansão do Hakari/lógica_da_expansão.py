@@ -10,6 +10,7 @@ class Simular_expansao:
         self.tries = 0
         self.message = "Se sente com sorte?"
         self.jackpot = False
+        self.scenario = 0
 
     def draw(self):
         print(f"Tentativas desde o último Jackpot: {self.tries}")
@@ -73,19 +74,17 @@ class Simular_expansao:
         print(f"{self.slots[0]} {self.slots[1]}")
         print("")
 
-    def riichi(self):
+    def set_scenario(self):
         if self.shoot <= 20:
-            print("Transit Card Riichi")
+            self.scenario = 0 #Transit Card Riichi
         elif self.shoot <= 50:
-            print("Seat Struggle Riichi")
+            self.scenario = 1 #Seat Struggle Riichi
         elif self.shoot < 80:
-            print("Potty Emergency Riichi")
+            self.scenario = 2 #Potty Emergency Riichi
         else:
-            print("Friday Night Final Train Riichi")
+            self.scenario = 3 #Friday Night Final Train Riichi
 
-        print(self.slots)
-        print("")
-
+    def riichi(self):
         if self.slots[0] == self.slots[1] and self.slots[1] == self.slots[2] and self.slots[0] != 0:
             self.jackpot = True
             self.message = "Seu Sortudo!!"
