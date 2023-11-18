@@ -30,10 +30,10 @@ class GameGui:
         self.slots = tk.Label(root, text=f"| {EXPANSION.slots[0]} | | {EXPANSION.slots[1]} | | {EXPANSION.slots[2]} |")
         self.slots.pack()
 
-        spin_button = tk.Button(root, text="Spin", command=self.spin, width=5, height=1)
-        riichi_button = tk.Button(root, text="Riichi", command=self.riichi, width=5, height=1)
-        riichi_button.pack(side="right", padx=100)
-        spin_button.pack(side="left", padx=100)
+        self.spin_button = tk.Button(root, text="Spin", command=self.spin, width=5, height=1)
+        self.riichi_button = tk.Button(root, text="Riichi", command=self.riichi, width=5, height=1)
+        self.riichi_button.pack(side="right", padx=100)
+        self.spin_button.pack(side="left", padx=100)
 
         self.load_scenarios()
         self.load_dance_images()
@@ -82,6 +82,7 @@ class GameGui:
         self.animate_balls()
 
     def riichi(self):
+        self.reroll_unset()
         EXPANSION.set_scenario()
         self.current_scenario = EXPANSION.scenario
         self.update_scenario()
@@ -101,12 +102,33 @@ class GameGui:
                     if EXPANSION.jackpot == True:
                         self.animate_dance_images()
                         self.canvas.delete("all")
-
+                    elif EXPANSION.message == "Se sentindo sortudo???":
+                        self.reroll_set()
 
         if EXPANSION.slots[0] != 0:
             update_last_number(0)
         else:
             self.message.config(text="Você precisa jogar se quiser ganhar!")
+
+    def reroll_set(self):
+        self.message_update()
+        self.spin_button.config(text="Sim!", command=lambda: self.reroll(True))
+        self.riichi_button.config(text="Não", command=lambda: self.reroll(False))
+
+    def reroll_unset(self):
+        self.spin_button.config(text="Spin", command=self.spin)
+        self.riichi_button.config(text="Riichi", command=self.riichi)
+
+    def reroll(self, lucky):
+        EXPANSION.chance_boost(lucky)
+        if lucky == True and EXPANSION.result_change_odd > 50:
+            self.reroll_unset()
+            self.riichi()
+        else:
+            
+            self.message_update()
+            self.reroll_unset()
+                
 
     #Setting animations        
     def animate_slots(self, final_numbers):
