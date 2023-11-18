@@ -16,7 +16,7 @@ class GameGui:
 
     #Setting elements
     def setup_gui(self): 
-        self.background = tk.Label(root) 
+        self.background = tk.Label(root, width=500, height=500) 
         self.background.place(x = 0, y = 0)
 
         self.canvas = tk.Canvas(root, width=80, height=80)
@@ -45,7 +45,7 @@ class GameGui:
         self.dance_images = [ImageTk.PhotoImage(img) for img in images]
 
     def create_dance_label(self):
-        self.dance = tk.Label(root, image=self.dance_images[0])
+        self.dance = tk.Label(self.root, image=self.dance_images[0], width=150, height=150)
         self.dance.image = self.dance_images[0]
         self.image_index = 0
         self.jackpot_animating = False
@@ -55,6 +55,7 @@ class GameGui:
         self.scenarios = [ImageTk.PhotoImage(img) for img in images]
     
     def update_scenario(self):
+        self.background.place(x = 0, y = 0)
         self.background.config(image = self.scenarios[self.current_scenario])
     
     #Setting messsages
@@ -66,7 +67,7 @@ class GameGui:
 
     #Game's main elements
     def reset_game_elements(self):
-        self.dance.forget()
+        self.dance.place_forget()
         self.jackpot_animating = False
         self.canvas.delete("all")  
 
@@ -75,6 +76,7 @@ class GameGui:
         EXPANSION.play()
         self.message_update()
         self.tries_message_update()
+        self.background.place_forget()
 
         final_numbers = [EXPANSION.slots[0], EXPANSION.slots[1], EXPANSION.slots[2]]
 
@@ -161,7 +163,7 @@ class GameGui:
 
     #Winning animation
     def animate_dance_images(self):
-        self.dance.pack()
+        self.dance.place(x=175, y=240)
         def toggle_image():
             if self.jackpot_animating:
                 self.image_index = (self.image_index + 1) % len(self.dance_images)
