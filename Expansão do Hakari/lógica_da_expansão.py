@@ -30,17 +30,17 @@ class Simular_expansao:
                 self.chance = list(range(1,101))
                 self.slots = [0, 0, 0]
             elif self.result_change_odd <= 80:
-                self.scenario = 4 #Yume Background
+                self.scenario = 5 #Yume Background
                 self.slots[2] = random.choice(range(1, 8))
                 self.chance = list(range(1,101))
                 self.riichi()
             elif self.result_change_odd <= 95:
-                self.scenario = 5 #Amanogawa Cut Scene
+                self.scenario = 6 #Amanogawa Cut Scene
                 self.slots[2] = random.choice(self.cards)
                 self.chance = list(range(1, 101))
                 self.riichi()
             elif self.result_change_odd > 95:
-                self.scenario = 6 #Group Indicators
+                self.scenario = 7 #Group Indicators
                 self.slots[2] = self.slots[0]
                 self.chance = list(range(1,101))
                 self.riichi()
@@ -49,6 +49,7 @@ class Simular_expansao:
 
     def play(self):
         self.jackpot = False
+        self.scenario = 0
         self.shoot = random.choice(self.chance)
         if self.tries != 0:
             self.chance = list(range(self.shoot, 101))
@@ -76,13 +77,13 @@ class Simular_expansao:
 
     def set_scenario(self):
         if self.shoot <= 20:
-            self.scenario = 0 #Transit Card Riichi
+            self.scenario = 1 #Transit Card Riichi
         elif self.shoot <= 50:
-            self.scenario = 1 #Seat Struggle Riichi
+            self.scenario = 2 #Seat Struggle Riichi
         elif self.shoot < 80:
-            self.scenario = 2 #Potty Emergency Riichi
+            self.scenario = 3 #Potty Emergency Riichi
         else:
-            self.scenario = 3 #Friday Night Final Train Riichi
+            self.scenario = 4 #Friday Night Final Train Riichi
 
     def riichi(self):
         if len(set(self.slots)) == 1 and self.slots[0] != 0:
