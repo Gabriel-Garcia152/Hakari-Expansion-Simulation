@@ -12,6 +12,7 @@ class SimulateExpansion:
         self.current_jackpot_chance = 0
         self.increasing_jackpot_chance = list(range(1,101))
         self.result_change_chance = 0
+        self.result_change_called = False
         
         #Message Elements
         self.tries = 0
@@ -20,6 +21,27 @@ class SimulateExpansion:
         #Background Image ID
         self.scenario_id = 0
 
+    def set_scenario(self):
+        if self.result_change_chance == 0 and not self.jackpot_reached:
+            if self.current_jackpot_chance <= 20:
+                self.scenario_id = 1 #Transit Card Riichi
+            elif self.current_jackpot_chance <= 50:
+                self.scenario_id = 2 #Seat Struggle Riichi
+            elif self.current_jackpot_chance < 80:
+                self.scenario_id = 3 #Potty Emergency Riichi
+            else:
+                self.scenario_id = 4 #Friday Night Final Train Riichi
+        elif not self.jackpot_reached:
+            if self.result_change_chance <= 50:
+                self.scenario_id = 5 #Yume Background
+            elif self.result_change_chance <= 75:
+                self.scenario_id = 6 #Amanogawa Cut Scene
+            else:
+                self.scenario_id = 7 #Group Indicators
+        else:
+            self.scenario_id = 8 #Jackpot scenario
+
+    #Sets the slots' numbers
     def draw_cards(self):
         if self.ball_color == "purple":
             #Guaranted Jackpot if ball color equals purple
@@ -30,35 +52,10 @@ class SimulateExpansion:
             for slot in range(0, len(self.slots)):
                 self.slots[slot] = random.choice(self.cards)
 
-    def result_change(self, felling_lucky):
-        if felling_lucky == True:
-            self.result_change_chance = random.choice(range(0, 101))
-            if self.result_change_chance <= 30:
-                self.message = "Tá se achando demais kkkk"
-                self.result_change_chance = 0
-                self.slots = [0, 0, 0]
-            elif self.result_change_chance <= 50:
-                self.set_scenario()
-                self.slots[2] = random.choice(range(1, 8))
-                self.debug("result_change")
-                self.result_change_chance = 0
-            elif self.result_change_chance <= 75:
-                self.set_scenario("result_change")
-                self.slots[2] = random.choice(self.cards)
-                self.debug("result_change")
-                self.result_change_chance = 0
-            elif self.result_change_chance > 75:
-                self.set_scenario()
-                self.slots[1] = self.slots[0]
-                self.slots[2] = self.slots[0]
-                self.debug("result_change")
-                self.increasing_jackpot_chance = list(range(1,101))
-                self.result_change_chance = 0
-        else:
-            self.message = "Resolveu Correr?"
-
+    #Sets odds, ball colors and calls 'draw_cards'
     def play(self):
         self.jackpot_reached = False
+        self.result_change_chance = 0
         self.scenario_id = 0
         self.current_jackpot_chance = random.choice(self.increasing_jackpot_chance)
         if self.tries != 0:
@@ -83,44 +80,61 @@ class SimulateExpansion:
         self.message = "Se sente com sorte?"
         self.debug("play")
 
-    def set_scenario(self):
-        if self.result_change_chance == 0 and not self.jackpot_reached:
-            if self.current_jackpot_chance <= 20:
-                self.scenario_id = 1 #Transit Card Riichi
-            elif self.current_jackpot_chance <= 50:
-                self.scenario_id = 2 #Seat Struggle Riichi
-            elif self.current_jackpot_chance < 80:
-                self.scenario_id = 3 #Potty Emergency Riichi
-            else:
-                self.scenario_id = 4 #Friday Night Final Train Riichi
-        elif not self.jackpot_reached:
-            if self.result_change_chance <= 50:
-                self.scenario_id = 5 #Yume Background
-            elif self.result_change_chance <= 75:
-                self.scenario_id = 6 #Amanogawa Cut Scene
-            else:
-                self.scenario_id = 7 #Group Indicators
-        else:
-            self.scenario_id = 8 #Jackpot scenario
-
+    #Verify winning conditions and can set the odds to call 'result_change'
     def riichi(self):
         if len(set(self.slots)) == 1 and self.slots[0] != 0:
             self.jackpot_reached = True
-            self.debug("riichi")
             self.set_scenario()
+            self.result_change_chance = 0
+            self.result_change_called = False
+            self.debug("riichi")
             self.jackpot_event()
         elif self.slots[0] == 0:
             self.message = "Você precisa apostar se quiser ganhar!"
-        else:
+        elif not self.result_change_called:
             luck = random.choice(range(1, 101))
             if luck > 30:
                 self.message = "Acha que pode mudar o jogo???"
-            else:
-                self.message = "Parece que não foi dessa vez!"
+                self.debug("riichi")
+        else:
+            self.message = "Parece que não foi dessa vez!"
+            self.debug("riichi")
+
+    #Changes slot's number
+    def result_change(self, felling_lucky):
+        if felling_lucky == True:
+            self.result_change_chance = random.choice(range(0, 101))
+            if self.result_change_chance <= 30:
+                self.message = "Tá se achando demais kkkk"
+                self.result_change_chance = 0
+                self.slots = [0, 0, 0]
+                self.result_change_called = True
+                self.debug("result_change")
+            elif self.result_change_chance <= 50:
+                self.set_scenario()
+                self.slots[2] = random.choice(range(1, 8))
+                self.result_change_called = True
+                self.debug("result_change")
+            elif self.result_change_chance <= 75:
+                self.set_scenario()
+                self.slots[2] = random.choice(self.cards)
+                self.result_change_called = True
+                self.debug("result_change")
+            elif self.result_change_chance > 75:
+                self.set_scenario()
+                self.slots[1] = self.slots[0]
+                self.slots[2] = self.slots[0]
+                self.result_change_called = True
+                self.debug("result_change")
+                self.increasing_jackpot_chance = list(range(1,101))
+        else:
+            self.message = "Resolveu Correr?"
+            self.result_change_called = True
 
     #Reset variables after winning
     def jackpot_event(self):
         self.message = "Seu Sortudo!!"
+        self.result_change_chance = 0
         self.tries = 0
         self.increasing_jackpot_chance = list(range(1,101))
         self.slots = [0, 0, 0]

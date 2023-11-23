@@ -43,47 +43,50 @@ class GameGui:
         self.create_dance_label()
         self.update_scenario()
 
-    #Setting images
+    #***Setting images***
+    
+    #Loading Dance Images
     def load_dance_images(self):
-        #Loading Dance Images
         images = [Image.open(f"Expansão do Hakari\dance images\dance_{i}.png").resize((150, 150)) for i in range(1, 4)]
         self.dance_images = [ImageTk.PhotoImage(img) for img in images]
 
+    #Creating Dance Label
     def create_dance_label(self):
-        #Creating Dance Label
         self.dance = tk.Label(self.root, image=self.dance_images[0], width=150, height=150)
         self.dance.image = self.dance_images[0]
         self.image_index = 0
         self.jackpot_animating = False
 
+    #Loading Scenario Images
     def load_scenarios(self):
-        #Loading Scenario Images
         images = [Image.open(f"Expansão do Hakari/scenarios/scenario({i}).png").resize((500, 500)) for i in range(0, 9)]
         self.scenarios = [ImageTk.PhotoImage(img) for img in images]
     
+    #Updating Background Image
     def update_scenario(self):
-        #Updating Background Image
         self.current_scenario = EXPANSION.scenario_id
         self.background.config(image = self.scenarios[self.current_scenario])
     
-    #Setting messsages
+    #***Setting messsages***
+
+    #Updating Main Message Label
     def message_update(self):
-        #Updating Main Message Label
         self.message.config(text=EXPANSION.message)
 
+    #Updating Tries Message Label
     def tries_message_update(self):
-        #Updating Tries Message Label
         self.tries_message.config(text=f"Tentativas desde o último Jackpot: {EXPANSION.tries}")
 
-    #Game's main elements
+    #***Game's main elements***
+
+    #Reseting Main Game Elements
     def reset_game_elements(self):
-        #Reseting Main Game Elements
         self.dance.place_forget()
         self.jackpot_animating = False
         self.canvas.delete("all")  
 
+    #Spinning Logic
     def spin(self, event=None):
-        #Spinning Logic
         self.reset_game_elements()
         EXPANSION.play()
         self.message_update()
@@ -95,8 +98,8 @@ class GameGui:
         self.animate_slots(final_numbers)
         self.animate_balls()
 
+    #Riichi Stage Logic
     def riichi(self, event=None):
-        #Riichi Stage Logic
         self.reroll_unset()
         EXPANSION.set_scenario()
         self.update_scenario()
@@ -106,25 +109,27 @@ class GameGui:
         else:
             self.message.config(text="Você precisa jogar se quiser ganhar!")
 
+    #Setting Reroll Elements
     def reroll_set(self):
-        #Setting Reroll Elements
         self.message_update()
         self.spin_button.config(text="Sim!", command=lambda: self.reroll(True))
         self.riichi_button.config(text="Não", command=lambda: self.reroll(False))
         self.root.bind("<KeyPress-s>", lambda event: self.reroll(True))
         self.root.bind("<KeyPress-r>", lambda event: self.reroll(False))
 
+    #Unsetting Reroll Elements
     def reroll_unset(self):
-        #Unsetting Reroll Elements
         self.spin_button.config(text="Spin", command=lambda: self.spin(None))
         self.riichi_button.config(text="Riichi", command=lambda: self.riichi(None))
         self.root.bind("<KeyPress-s>", self.spin)
         self.root.bind("<KeyPress-r>", self.riichi)
 
+    #Reroll Logic
     def reroll(self, lucky):
-        #Reroll Logic
         EXPANSION.result_change(lucky)
         if lucky == True and EXPANSION.result_change_chance > 50:
+            self.message_update()
+            self.update_scenario()
             self.riichi()
         else:
             self.message_update()
@@ -152,8 +157,8 @@ class GameGui:
             elif EXPANSION.message == "Acha que pode mudar o jogo???":
                 self.reroll_set()
 
+    #Animating Spinning Slots
     def animate_slots(self, final_numbers):
-        #Animating Spinning Slots
         animation_speed = 50
         total_iterations = 20
 
@@ -168,8 +173,8 @@ class GameGui:
 
         update_numbers(0)
 
+    #Animating Ball's Shoots
     def animate_balls(self):
-        #Animating Ball's Shoots
         x1, y1 = 25, 25
         animation_speed = 50
 
@@ -182,8 +187,8 @@ class GameGui:
 
         move_ball(x1, y1)
 
+    #Winning Animation 
     def animate_dance_images(self):
-        #Winning Animation 
         self.dance.place(x=175, y=240)
         def toggle_image():
             if self.jackpot_animating:
